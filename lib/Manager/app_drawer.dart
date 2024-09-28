@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'dart:async'; // For the delayed logout
 import 'permissions_screen.dart';
 import 'history_screen.dart';
 import 'location_selection_screen.dart';
+import 'screens/attendance_login_page.dart'; // Import the login page
 
 class AppDrawer extends StatelessWidget {
   @override
@@ -19,9 +21,9 @@ class AppDrawer extends StatelessWidget {
               children: [
                 Image.asset(
                   'assets/logo_atd.png',
-                  width: 70.0, // Adjust width to fit inside the circle
-                  height: 70.0, // Adjust height to fit inside the circle
-                  fit: BoxFit.contain, // Ensures the image fits properly
+                  width: 70.0,
+                  height: 70.0,
+                  fit: BoxFit.contain,
                 ),
                 SizedBox(height: 10),
                 Text(
@@ -56,8 +58,7 @@ class AppDrawer extends StatelessWidget {
               ),
             );
           }),
-          _buildDrawerItem(context, 'Manual Attendance', Icons.check_circle,
-              () {
+          _buildDrawerItem(context, 'Manual Attendance', Icons.check_circle, () {
             Navigator.push(
               context,
               MaterialPageRoute(
@@ -66,14 +67,72 @@ class AppDrawer extends StatelessWidget {
             );
           }),
           _buildDrawerItem(context, 'Contact', Icons.phone, () {
-            // Handle Contact
+            _showContactInfo(context); // Show contact info when tapped
           }),
           _buildDrawerItem(context, 'Logout', Icons.exit_to_app, () {
-            // Handle Logout
+            _handleLogout(context); // Handle logout with animation
           }),
         ],
       ),
     );
+  }
+
+  // Function to show contact info
+  void _showContactInfo(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Contact Us"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: Icon(Icons.phone),
+                title: Text('Phone: +123 456 7890'),
+              ),
+              ListTile(
+                leading: Icon(Icons.email),
+                title: Text('Email: contact@company.com'),
+              ),
+              ListTile(
+                leading: Icon(Icons.location_on),
+                title: Text('Address: 123 Company St, City, Country'),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: Text("Close"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // Function to handle logout with loading animation
+  void _handleLogout(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false, // Prevent dismissing by tapping outside
+      builder: (BuildContext context) {
+        return Center(
+          child: CircularProgressIndicator(), // Show circular loading indicator
+        );
+      },
+    );
+
+    // Simulate a delay for loading (e.g., 2 seconds), then redirect to login page
+    Timer(Duration(seconds: 2), () {
+      Navigator.of(context).pop(); // Close the loading dialog
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => AttendanceLoginPage()),
+      );
+    });
   }
 
   Widget _buildDrawerItem(
